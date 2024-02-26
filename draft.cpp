@@ -53,7 +53,7 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
     double P1 = EXP1 >= S * S ? 1 : ((double)EXP1 / (S * S) + 80) / 123;
 
     // Route 2
-    // Check if M1 = 0
+    // Check if M1 != 0
     if (M1)
     {
         // Check for E2 parity
@@ -64,7 +64,6 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
                 eventsRoute2(HP1, EXP1, M1, m, 1);
         }
         else // even
-
             eventsRoute2(HP1, EXP1, M1, m, 0);
     }
     // HP and EXP status update
@@ -95,12 +94,12 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
     HP1 = clamp(HP1, 0, 666);
     EXP1 = clamp(EXP1, 0, 600);
     M1 = clamp(M1, 0, 3000);
-    cout << "HP1 = " << HP1 << "\nEXP1 = " << EXP1 << "\nM1 = " << M1 << "\nP1 = " << P1 << "\nP2 = " << P2 << "\nP3 = " << P3 << "\n";
+    cout << P1 << ' ' << P2 << ' ' << P3 << '\n';
     return HP1 + EXP1 + M1;
 }
 int main()
 {
-    int hp1 = 333, exp1 = 333, m1 = 2222, e2 = 31;
+    int hp1 = 100, exp1 = 401, m1 = 0, e2 = 41;
     // cin >> hp1 >> exp1 >> m1 >> e2;
     cout << traceLuggage(hp1, exp1, m1, e2);
 }

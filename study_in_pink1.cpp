@@ -55,16 +55,15 @@ int firstMeet(int &exp1, int &exp2, int e1)
     // Case 0 <= e1 <= 3
     if (e1 <= 3)
     {
-        if (exp2 == 0)
+        if (e1 == 0)
             exp2 += 29;
-        else if (exp2 == 1)
+        else if (e1 == 1)
             exp2 += 45;
-        else if (exp2 == 2)
+        else if (e1 == 2)
             exp2 += 75;
         else
             exp2 += 149;
-
-        // Calculate Decision D
+        // Calculate decision D
         int D = e1 * 3 + exp1 * 7;
         exp1 += ceil(!(D & 1) ? D / 200.0 : -D / 100);
     }
@@ -87,7 +86,7 @@ int firstMeet(int &exp1, int &exp2, int e1)
         {
             exp2 = clamp(ceil(ceil(exp2 + e1 / 4.0 + 19) + e1 / 9.0 + 21), 0, 600);
             // Check exp2 for bonus of info 3 and 15% of total exp
-            exp2 = ceil(exp2 > 400 ? 1.15 * (ceil(exp2 + e1 / 16.0 + 17)) : exp2);
+            exp2 = ceil(exp2 > 400 ? 1.15 * ceil(exp2 + e1 / 16.0 + 17) : exp2);
         }
 
         // exp1 loses e1 exp
@@ -142,7 +141,7 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
     double P1 = EXP1 >= S * S ? 1 : ((double)EXP1 / (S * S) + 80) / 123;
 
     // Route 2
-    // Check if M1 = 0
+    // Check if M1 != 0
     if (M1)
     {
         // Check for E2 parity
