@@ -186,9 +186,41 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
 }
 
 // Task 3
+// Maximum value of taxi coordinate's diagonals at a point
+int maxDiag(int taxi[10][10], int row, int column)
+{
+    int res = taxi[row][column];
+    return res;
+}
 int chaseTaxi(int &HP1, int &EXP1, int &HP2, int &EXP2, int E3)
 {
-    // TODO: Complete this function
+    // Check for conditions
+    if (E3 < 0 or E3 > 99)
+        return -99;
+    HP1 = clamp(HP1, 0, 666);
+    EXP1 = clamp(EXP1, 0, 600);
+    HP2 = clamp(HP2, 0, 666);
+    EXP2 = clamp(EXP2, 0, 600);
+
+    // Initialize taxi and Sherlock coordinate matrix
+    int taxi[10][10], sher[10][10];
+    // Taxi moves along rows
+    // Row: i, Column: j
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            taxi[i][j] = (E3 * j + i * 2) * (i - j);
+        }
+    }
+    // Sherlock moves along columns
+    for (int j = 0; j < 10; j++)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            sher[i][j] = maxDiag(taxi, i, j);
+        }
+    }
 
     return -1;
 }
