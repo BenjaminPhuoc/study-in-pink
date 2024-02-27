@@ -9,72 +9,106 @@ int clamp(int a, int b, int c)
         return c;
     return a;
 }
-// Task 3
-// Maximum value of taxi coordinate's diagonals at a point
-int maxDiag(int taxi[10][10], int row, int column)
+// Task 2
+// Events of route 2
+void eventsRoute2(int &HP1, int &EXP1, int &M1, int m, int E)
 {
-    int res = taxi[row][column];
-    int i = column - row >= 0 ? 0 : row - column;
-    int j = column - row >= 0 ? column - row : 0;
-    while (i < 10 and j < 10)
-    {
-        res = max(res, taxi[i][j]);
-        i++;
-        j++;
-    }
-    i = column + row > 9 ? column + row - 9 : 0;
-    j = column + row > 9 ? 9 : column + row;
-    while (i < 10 and j >= 0)
-    {
-        res = max(res, taxi[i][j]);
-        i++;
-        j--;
-    }
-    return res;
+    // Buy food and drink
+    M1 = clamp(HP1 < 200 ? M1 - 150 : M1 - 70, 0, 3000);
+    HP1 = clamp(ceil(HP1 < 200 ? HP1 * 130 / 100.0 : HP1 * 110 / 100.0), 0, 666);
+    cout << "Buy food and drink:\nHP1 = " << HP1 << "\nM1 = " << M1 << "\nEXP1 = " << EXP1 << "\n";
+    if (E and 2 * M1 < m) // E2 is odd and payment > 50%
+        return;
+    if (!E and !M1) // E2 is even and M1 = 0
+        return;
+    // Vehicle rental
+    M1 = clamp(EXP1 < 400 ? M1 - 200 : M1 - 120, 0, 3000);
+    EXP1 = clamp(ceil(EXP1 * 113 / 100.0), 0, 600);
+    cout << "Vehicle rental:\nM1 = " << M1 << "\nEXP1 = " << EXP1 << "\nHP1 = " << HP1 << "\n";
+    if (E and 2 * M1 < m) // E2 is odd and payment > 50%
+        return;
+    if (!E and !M1) // E2 is even and M1 = 0
+        return;
+    // Homeless's blunder
+    M1 = clamp(EXP1 < 300 ? M1 - 100 : M1 - 120, 0, 3000);
+    EXP1 = clamp(ceil(EXP1 * 90 / 100.0), 0, 600);
+    cout << "Homeless's blunder:\nM1 = " << M1 << "\nEXP1 = " << EXP1 << "\nHP1 = " << HP1 << "\n";
 }
-int chaseTaxi(int &HP1, int &EXP1, int &HP2, int &EXP2, int E3)
+int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
 {
     // Check for conditions
-    if (E3 < 0 or E3 > 99)
+    if (E2 < 0 or E2 > 99)
         return -99;
     HP1 = clamp(HP1, 0, 666);
     EXP1 = clamp(EXP1, 0, 600);
-    HP2 = clamp(HP2, 0, 666);
-    EXP2 = clamp(EXP2, 0, 600);
+    M1 = clamp(M1, 0, 3000);
 
-    // Taxi coordinate matrix
-    int taxi[10][10];
-    int x = 0, y = 0; // Intersect coordinate
-    // Taxi moves along rows
-    // Row: i, Column: j
-    for (int i = 0; i < 10; i++)
+    int S = 0, m = M1; // Perfect square number S, initial money m
+    // double P1, P2, P3; // Route probabilities
+    while (S * S < EXP1)
+        S++;
+    // Find S nearest to EXP1
+    S = EXP1 - (S - 1) * (S - 1) < S * S - EXP1 ? S - 1 : S;
+
+    // Route 1
+    // Probability of route 1
+    double P1 = EXP1 >= S * S ? 1 : ((double)EXP1 / (S * S) + 80) / 123;
+    cout << "Route 1\nNearest S = " << S * S << "\nP1 = " << P1 << "\n";
+    // Route 2
+    // Check if M1 != 0
+    cout << "Route 2\nM1 = " << M1 << "\nHP1 = " << HP1 << "\nEXP1 = " << EXP1 << "\n";
+    if (M1)
     {
-        for (int j = 0; j < 10; j++)
+        // Check for E2 parity
+        if (E2 & 1) // odd
         {
-            taxi[i][j] = (E3 * j + i * 2) * (i - j);
-            if (taxi[i][j] > E3 * 2)
-                x++;
-            if (taxi[i][j] < -E3)
-                y++;
+            cout << "E2 = " << E2 << " is odd\n";
+            // Loop of events
+            while (2 * M1 >= m)
+                eventsRoute2(HP1, EXP1, M1, m, 1);
         }
+        else // even
+            eventsRoute2(HP1, EXP1, M1, m, 0);
+        cout << "Stop loop\n";
     }
-    while (x > 9)
-        x = x % 10 + x / 10;
-    while (y > 9)
-        y = y % 10 + y / 10;
-    // Sherlock's point
-    int sher = abs(maxDiag(taxi, x, y));
-    // EXP and HP change after the chase
-    EXP1 = clamp(ceil(abs(taxi[x][y]) > sher ? EXP1 * 0.88 : EXP1 * 1.12), 0, 600);
-    EXP2 = clamp(ceil(abs(taxi[x][y]) > sher ? EXP2 * 0.88 : EXP2 * 1.12), 0, 600);
-    HP1 = clamp(ceil(abs(taxi[x][y]) > sher ? HP1 * 0.9 : HP1 * 1.1), 0, 666);
-    HP2 = clamp(ceil(abs(taxi[x][y]) > sher ? HP2 * 0.9 : HP2 * 1.1), 0, 666);
-    // Return value of the winner of the chase
-    return abs(taxi[x][y]) > sher ? taxi[x][y] : sher;
-}
+    // HP and EXP status update
+    HP1 = clamp(ceil(HP1 * 83 / 100.0), 0, 666);
+    EXP1 = clamp(ceil(EXP1 * 117 / 100.0), 0, 600);
+    cout << "HP1 = " << HP1 << "\nEXP1 = " << EXP1 << "\nM1 = " << M1 << "\n";
+    // Recalculation of nearest perfect quare
+    S = 0;
+    while (S * S < EXP1)
+        S++;
+    S = EXP1 - (S - 1) * (S - 1) < S * S - EXP1 ? S - 1 : S;
 
+    // Probability of route 2
+    double P2 = EXP1 >= S * S ? 1 : ((double)EXP1 / (S * S) + 80) / 123;
+    cout << "Nearest S = " << S * S << "\nP2 = " << P2 << "\nRoute 3\n";
+    // Route 3
+    int P[10] = {32, 47, 28, 79, 100, 50, 22, 83, 64, 11}; // Array of probabilities
+    // Probability of route 3
+    double P3 = E2 < 10 ? P[E2] / 100.0 : P[(E2 % 10 + E2 / 10) % 10] / 100.0;
+    // Check for probabilities
+    cout << "E2 = " << E2 << "\ni = " << (E2 % 10 + E2 / 10) % 10 << "\nP3 = " << P3 << "\nWe have:\n"
+         << "\nP1 = " << P1 << "\nP2 = " << P2 << "\nP3 = " << P3 << "\n";
+    if (P1 == 1 and P2 == 1 and P3 == 1)
+        EXP1 = ceil(EXP1 * 75 / 100.0);
+    else
+    {
+        double P4 = (P1 + P2 + P3) / 3;
+        cout << "Pavg = " << P4 << "\n";
+        HP1 = ceil(P4 < 0.5 ? HP1 * 85 / 100.0 : HP1 * 90 / 100.0);
+        EXP1 = ceil(P4 < 0.5 ? EXP1 * 115 / 100.0 : EXP1 * 120 / 100.0);
+    }
+    cout << "HP1 = " << HP1 << "\nEXP1 = " << EXP1 << "\nM1 = " << M1 << "\n";
+    HP1 = clamp(HP1, 0, 666);
+    EXP1 = clamp(EXP1, 0, 600);
+    M1 = clamp(M1, 0, 3000);
+    return HP1 + EXP1 + M1;
+}
 int main()
 {
-    int hp1 = 400, exp1 = 600, hp2 = 350, exp2 = 500, e3 = 99;
-    cout << chaseTaxi(hp1, exp1, hp2, exp2, e3);
+    int hp1 = 167, exp1 = 446, m1 = 1583, e2 = 97;
+    cout << traceLuggage(hp1, exp1, m1, e2);
+    // cout << fixed << setprecision(20) << (330 * 110 / 100.0);
 }

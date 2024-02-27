@@ -86,7 +86,7 @@ int firstMeet(int &exp1, int &exp2, int e1)
         {
             exp2 = clamp(ceil(ceil(exp2 + e1 / 4.0 + 19) + e1 / 9.0 + 21), 0, 600);
             // Check exp2 for bonus of info 3 and 15% of total exp
-            exp2 = ceil(exp2 > 400 ? 1.15 * ceil(exp2 + e1 / 16.0 + 17) : exp2);
+            exp2 = ceil(exp2 > 400 ? (115 / 100.0) * ceil(exp2 + e1 / 16.0 + 17) : exp2);
         }
 
         // exp1 loses e1 exp
@@ -103,22 +103,22 @@ int firstMeet(int &exp1, int &exp2, int e1)
 void eventsRoute2(int &HP1, int &EXP1, int &M1, int m, int E)
 {
     // Buy food and drink
-    HP1 = clamp(ceil(HP1 < 200 ? HP1 * 1.3 : HP1 * 1.1), 0, 666);
     M1 = clamp(HP1 < 200 ? M1 - 150 : M1 - 70, 0, 3000);
+    HP1 = clamp(ceil(HP1 < 200 ? HP1 * 130 / 100.0 : HP1 * 110 / 100.0), 0, 666);
     if (E and 2 * M1 < m) // E2 is odd and payment > 50%
         return;
     if (!E and !M1) // E2 is even and M1 = 0
         return;
     // Vehicle rental
     M1 = clamp(EXP1 < 400 ? M1 - 200 : M1 - 120, 0, 3000);
-    EXP1 = clamp(ceil(EXP1 * 1.13), 0, 600);
+    EXP1 = clamp(ceil(EXP1 * 113 / 100.0), 0, 600);
     if (E and 2 * M1 < m) // E2 is odd and payment > 50%
         return;
     if (!E and !M1) // E2 is even and M1 = 0
         return;
     // Homeless's blunder
     M1 = clamp(EXP1 < 300 ? M1 - 100 : M1 - 120, 0, 3000);
-    EXP1 = clamp(ceil(EXP1 * 0.9), 0, 600);
+    EXP1 = clamp(ceil(EXP1 * 90 / 100.0), 0, 600);
 }
 int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
 {
@@ -155,8 +155,8 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
             eventsRoute2(HP1, EXP1, M1, m, 0);
     }
     // HP and EXP status update
-    HP1 = clamp(ceil(HP1 * 0.83), 0, 666);
-    EXP1 = clamp(ceil(EXP1 * 1.17), 0, 600);
+    HP1 = clamp(ceil(HP1 * 83 / 100.0), 0, 666);
+    EXP1 = clamp(ceil(EXP1 * 117 / 100.0), 0, 600);
     // Recalculation of nearest perfect quare
     S = 0;
     while (S * S < EXP1)
@@ -171,12 +171,12 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
     double P3 = E2 < 10 ? P[E2] / 100.0 : P[(E2 % 10 + E2 / 10) % 10] / 100.0;
     // Check for probabilities
     if (P1 == 1 and P2 == 1 and P3 == 1)
-        EXP1 = ceil(EXP1 * 0.75);
+        EXP1 = ceil(EXP1 * 75 / 100.0);
     else
     {
         double P4 = (P1 + P2 + P3) / 3;
-        HP1 = ceil(P4 < 0.5 ? HP1 * 0.85 : HP1 * 0.9);
-        EXP1 = ceil(P4 < 0.5 ? EXP1 * 1.15 : EXP1 * 1.2);
+        HP1 = ceil(P4 < 0.5 ? HP1 * 85 / 100.0 : HP1 * 90 / 100.0);
+        EXP1 = ceil(P4 < 0.5 ? EXP1 * 115 / 100.0 : EXP1 * 120 / 100.0);
     }
 
     HP1 = clamp(HP1, 0, 666);
@@ -241,10 +241,10 @@ int chaseTaxi(int &HP1, int &EXP1, int &HP2, int &EXP2, int E3)
     // Sherlock's point
     int sher = abs(maxDiag(taxi, x, y));
     // EXP and HP change after the chase
-    EXP1 = clamp(ceil(abs(taxi[x][y]) > sher ? EXP1 * 0.88 : EXP1 * 1.12), 0, 600);
-    EXP2 = clamp(ceil(abs(taxi[x][y]) > sher ? EXP2 * 0.88 : EXP2 * 1.12), 0, 600);
-    HP1 = clamp(ceil(abs(taxi[x][y]) > sher ? HP1 * 0.9 : HP1 * 1.1), 0, 666);
-    HP2 = clamp(ceil(abs(taxi[x][y]) > sher ? HP2 * 0.9 : HP2 * 1.1), 0, 666);
+    EXP1 = clamp(ceil(abs(taxi[x][y]) > sher ? EXP1 * 88 / 100.0 : EXP1 * 112 / 100.0), 0, 600);
+    EXP2 = clamp(ceil(abs(taxi[x][y]) > sher ? EXP2 * 88 / 100.0 : EXP2 * 112 / 100.0), 0, 600);
+    HP1 = clamp(ceil(abs(taxi[x][y]) > sher ? HP1 * 90 / 100.0 : HP1 * 110 / 100.0), 0, 666);
+    HP2 = clamp(ceil(abs(taxi[x][y]) > sher ? HP2 * 90 / 100.0 : HP2 * 110 / 100.0), 0, 666);
     // Return value of the winner of the chase
     return abs(taxi[x][y]) > sher ? taxi[x][y] : sher;
 }
