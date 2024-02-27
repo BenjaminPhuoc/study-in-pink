@@ -190,6 +190,22 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
 int maxDiag(int taxi[10][10], int row, int column)
 {
     int res = taxi[row][column];
+    int i = column - row >= 0 ? 0 : row - column;
+    int j = column - row >= 0 ? column - row : 0;
+    while (i < 10 and j < 10)
+    {
+        res = max(res, taxi[i][j]);
+        i++;
+        j++;
+    }
+    i = column + row > 9 ? column + row - 9 : 0;
+    j = column + row > 9 ? 9 : column + row;
+    while (i < 10 and j >= 0)
+    {
+        res = max(res, taxi[i][j]);
+        i++;
+        j--;
+    }
     return res;
 }
 int chaseTaxi(int &HP1, int &EXP1, int &HP2, int &EXP2, int E3)
@@ -202,8 +218,9 @@ int chaseTaxi(int &HP1, int &EXP1, int &HP2, int &EXP2, int E3)
     HP2 = clamp(HP2, 0, 666);
     EXP2 = clamp(EXP2, 0, 600);
 
-    // Initialize taxi and Sherlock coordinate matrix
-    int taxi[10][10], sher[10][10];
+    // Taxi coordinate matrix
+    int taxi[10][10];
+    int x = 0, y = 0; // Intersect coordinate
     // Taxi moves along rows
     // Row: i, Column: j
     for (int i = 0; i < 10; i++)
@@ -211,18 +228,25 @@ int chaseTaxi(int &HP1, int &EXP1, int &HP2, int &EXP2, int E3)
         for (int j = 0; j < 10; j++)
         {
             taxi[i][j] = (E3 * j + i * 2) * (i - j);
+            if (taxi[i][j] > E3 * 2)
+                x++;
+            if (taxi[i][j] < -E3)
+                y++;
         }
     }
-    // Sherlock moves along columns
-    for (int j = 0; j < 10; j++)
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            sher[i][j] = maxDiag(taxi, i, j);
-        }
-    }
-
-    return -1;
+    while (x > 9)
+        x = x % 10 + x / 10;
+    while (y > 9)
+        y = y % 10 + y / 10;
+    // Sherlock's point
+    int sher = abs(maxDiag(taxi, x, y));
+    // EXP and HP change after the chase
+    EXP1 = clamp(ceil(abs(taxi[x][y]) > sher ? EXP1 * 0.88 : EXP1 * 1.12), 0, 600);
+    EXP2 = clamp(ceil(abs(taxi[x][y]) > sher ? EXP2 * 0.88 : EXP2 * 1.12), 0, 600);
+    HP1 = clamp(ceil(abs(taxi[x][y]) > sher ? HP1 * 0.9 : HP1 * 1.1), 0, 666);
+    HP2 = clamp(ceil(abs(taxi[x][y]) > sher ? HP2 * 0.9 : HP2 * 1.1), 0, 666);
+    // Return value of the winner of the chase
+    return abs(taxi[x][y]) > sher ? taxi[x][y] : sher;
 }
 
 // Task 4
