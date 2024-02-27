@@ -131,7 +131,7 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
 
     int S = 0, m = M1; // Perfect square number S, initial money m
     // double P1, P2, P3; // Route probabilities
-    while (S * S < EXP1)
+    while (S * S <= EXP1)
         S++;
     // Find S nearest to EXP1
     S = EXP1 - (S - 1) * (S - 1) < S * S - EXP1 ? S - 1 : S;
@@ -159,7 +159,7 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
     EXP1 = clamp(ceil(EXP1 * 117 / 100.0), 0, 600);
     // Recalculation of nearest perfect quare
     S = 0;
-    while (S * S < EXP1)
+    while (S * S <= EXP1)
         S++;
     S = EXP1 - (S - 1) * (S - 1) < S * S - EXP1 ? S - 1 : S;
     // Probability of route 2

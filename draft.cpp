@@ -45,7 +45,7 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
 
     int S = 0, m = M1; // Perfect square number S, initial money m
     // double P1, P2, P3; // Route probabilities
-    while (S * S < EXP1)
+    while (S * S <= EXP1)
         S++;
     // Find S nearest to EXP1
     S = EXP1 - (S - 1) * (S - 1) < S * S - EXP1 ? S - 1 : S;
@@ -77,7 +77,7 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
     cout << "HP1 = " << HP1 << "\nEXP1 = " << EXP1 << "\nM1 = " << M1 << "\n";
     // Recalculation of nearest perfect quare
     S = 0;
-    while (S * S < EXP1)
+    while (S * S <= EXP1)
         S++;
     S = EXP1 - (S - 1) * (S - 1) < S * S - EXP1 ? S - 1 : S;
 
@@ -108,7 +108,7 @@ int traceLuggage(int &HP1, int &EXP1, int &M1, int E2)
 }
 int main()
 {
-    int hp1 = 167, exp1 = 446, m1 = 1583, e2 = 97;
+    int hp1 = 273, exp1 = 0, m1 = 287, e2 = 95;
     cout << traceLuggage(hp1, exp1, m1, e2);
     // cout << fixed << setprecision(20) << (330 * 110 / 100.0);
 }
