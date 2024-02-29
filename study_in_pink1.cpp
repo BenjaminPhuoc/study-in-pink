@@ -266,6 +266,8 @@ char *substr(const char *src, int m, int n)
 // Check if se is a substring of s
 int isSubstring(const char *se, const char *s)
 {
+    if (!strlen(se))
+        return 1;
     int i = 0, j = 0;
     while (s[i] != '\0')
     {
@@ -278,8 +280,9 @@ int isSubstring(const char *se, const char *s)
                 j++;
             }
             if (se[j] == '\0')
-                return i + 1;
+                return init + 1;
             j = 0;
+            i = init;
         }
         i++;
     }
@@ -289,9 +292,8 @@ int consecutiveChar(const char *s, int n)
 {
     for (int i = 0; i < n - 1; i++)
     {
-        if (s[i] != s[i + 1])
-            continue;
-        return i + 1;
+        if (s[i] == s[i + 1] and s[i] == s[i + 2])
+            return i + 1;
     }
     return 0;
 }
@@ -321,7 +323,10 @@ int checkPassword(const char *s, const char *email)
     for (int i = 0; i < n1; i++)
     {
         if (s[i] == '@' or s[i] == '#' or s[i] == '%' or s[i] == '$' or s[i] == '!')
+        {
             found = 1;
+            continue;
+        }
         if (s[i] >= 48 and s[i] <= 57 or s[i] >= 65 and s[i] <= 90 or s[i] >= 97 and s[i] <= 122)
             continue;
         illegal = illegal == 0 ? i + 1 : min(illegal, i + 1);
