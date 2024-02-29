@@ -250,11 +250,87 @@ int chaseTaxi(int &HP1, int &EXP1, int &HP2, int &EXP2, int E3)
 }
 
 // Task 4
+// Find substring
+char *substr(const char *src, int m, int n)
+{
+    int len = n - m;
+    char *dest = (char *)malloc(sizeof(char) * (len + 1));
+    for (int i = m; i < n && (*(src + i) != '\0'); i++)
+    {
+        *dest = *(src + i);
+        dest++;
+    }
+    *dest = '\0';
+    return dest - len;
+}
+// Check if se is a substring of s
+int isSubstring(const char *se, const char *s)
+{
+    int i = 0, j = 0;
+    while (s[i] != '\0')
+    {
+        if (s[i] == se[j])
+        {
+            int init = i;
+            while (s[i] == se[j] and se[j] != '\0')
+            {
+                i++;
+                j++;
+            }
+            if (se[j] == '\0')
+                return i + 1;
+            j = 0;
+        }
+        i++;
+    }
+    return 0;
+}
+int consecutiveChar(const char *s, int n)
+{
+    for (int i = 0; i < n - 1; i++)
+    {
+        if (s[i] != s[i + 1])
+            continue;
+        return i + 1;
+    }
+    return 0;
+}
 int checkPassword(const char *s, const char *email)
 {
-    // TODO: Complete this function
-
-    return -99;
+    int n1 = strlen(s), n2 = strlen(email);
+    if (n1 < 8)
+        return -1;
+    if (n1 > 20)
+        return -2;
+    // Find se
+    int pos = 0;
+    for (int i = 0; i < n2; i++)
+    {
+        if (email[i] == '@')
+            pos = i;
+    }
+    const char *se = substr(email, 0, pos);
+    int substringPos = isSubstring(se, s);
+    if (substringPos)
+        return -(300 + substringPos - 1);
+    int consecutivePos = consecutiveChar(s, n1);
+    if (consecutivePos)
+        return -(400 + consecutivePos - 1);
+    int illegal = 0; // Check if s contains illegal characters
+    bool found = 0;  // Check if s contains special characters
+    for (int i = 0; i < n1; i++)
+    {
+        if (s[i] == '@' or s[i] == '#' or s[i] == '%' or s[i] == '$' or s[i] == '!')
+            found = 1;
+        if (s[i] >= 48 and s[i] <= 57 or s[i] >= 65 and s[i] <= 90 or s[i] >= 97 and s[i] <= 122)
+            continue;
+        illegal = illegal == 0 ? i + 1 : min(illegal, i + 1);
+    }
+    if (!found)
+        return -5;
+    if (illegal)
+        return illegal - 1;
+    return -10;
 }
 
 // Task 5
