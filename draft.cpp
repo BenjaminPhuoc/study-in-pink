@@ -1,120 +1,121 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+#include <cstring>
+#include <climits>
+#include <string>
+#include <fstream>
+#include <sstream>
 using namespace std;
-// Clamp function
-// Task 4
-// Find substring
-char *substr(const char *src, int m, int n)
+// Define a map
+struct node
 {
-    int len = n - m;
-    char *dest = (char *)malloc(sizeof(char) * (len + 1));
-    for (int i = m; i < n && (*(src + i) != '\0'); i++)
-    {
-        *dest = *(src + i);
-        dest++;
-    }
-    *dest = '\0';
-    return dest - len;
-}
-// Check if se is a substring of s
-int isSubstring(const char *se, const char *s)
+    const char *pwd;
+    int freq;
+    int pos;
+    node *next;
+};
+struct map
 {
-    if (!strlen(se))
-        return 1;
-    int i = 0, j = 0;
-    while (s[i] != '\0')
-    {
-        if (s[i] == se[j])
-        {
-            int init = i;
-            while (s[i] == se[j] and se[j] != '\0')
-            {
-                i++;
-                j++;
-            }
-            if (se[j] == '\0')
-                return init + 1;
-            j = 0;
-            i = init;
-        }
-        i++;
-    }
-    return 0;
-}
-int consecutiveChar(const char *s, int n)
-{
-    for (int i = 0; i < n - 1; i++)
-    {
-        if (s[i] == s[i + 1] and s[i] == s[i + 2])
-            return i + 1;
-    }
-    return 0;
-}
-int checkPassword(const char *s, const char *email)
-{
-    int n1 = strlen(s), n2 = strlen(email);
-    if (n1 < 8)
-    {
-        cout << "too short\n";
-        return -1;
-    }
-    if (n1 > 20)
-    {
-        cout << "too long\n";
-        return -2;
-    }
-    // Find se
-    int pos = 0;
-    for (int i = 0; i < n2; i++)
-    {
-        if (email[i] == '@')
-            pos = i;
-    }
-    const char *se = substr(email, 0, pos);
-    cout << se << ' ' << s << '\n';
-    int substringPos = isSubstring(se, s);
-    cout << substringPos << '\n';
-    if (substringPos)
-    {
-        cout << "s contains se, pos = " << substringPos - 1 << "\n";
-        return -(300 + substringPos - 1);
-    }
+private:
+    node *root;
 
-    int consecutivePos = consecutiveChar(s, n1);
-    if (consecutivePos)
+public:
+    map() : root(nullptr) {}
+    void insert(const char *pwd, int freq, int pos)
     {
-        cout << "s contains consecutive chars, pos = " << consecutivePos - 1 << "\n";
-        return -(400 + consecutivePos - 1);
-    }
-    int illegal = 0; // Check if s contains illegal characters
-    bool found = 0;  // Check if s contains special characters
-    for (int i = 0; i < n1; i++)
-    {
-        if (s[i] == '@' or s[i] == '#' or s[i] == '%' or s[i] == '$' or s[i] == '!')
+        // Check if key already exists
+        node *current = root;
+        while (current != nullptr)
         {
-            found = 1;
-            continue;
+            if (strcmp(current->pwd, pwd) == 0)
+            {
+                // Update value if key exists
+                current->freq = freq;
+                current->pos = min(pos, current->pos);
+                return;
+            }
+            current = current->next;
         }
-        if (s[i] >= 48 and s[i] <= 57 or s[i] >= 65 and s[i] <= 90 or s[i] >= 97 and s[i] <= 122)
-            continue;
-        illegal = illegal == 0 ? i + 1 : min(illegal, i + 1);
+        // Key doesn't exist, create a new node
+        node *newNode = new node{pwd, freq, pos, root};
+        root = newNode;
     }
-    if (!found)
+    int getFreq(const char *pwd)
     {
-        cout << "s doesn't contain special char\n";
-        return -5;
+        node *current = root;
+        while (current != nullptr)
+        {
+            if (strcmp(current->pwd, pwd) == 0)
+                return current->freq;
+            current = current->next;
+        }
+        return 0;
     }
-    if (illegal)
+    int getPos(const char *pwd)
     {
-        cout << "s contains illegal char, pos = " << illegal - 1 << "\n";
-        return illegal - 1;
+        node *current = root;
+        while (current != nullptr)
+        {
+            if (strcmp(current->pwd, pwd) == 0)
+                return current->pos;
+            current = current->next;
+        }
+        return 0;
     }
-    cout << "s is legal\n";
-    return -10;
+};
+int findCorrectPassword(const char *arr_pwds[], int num_pwds)
+{
+    // Map for storing passwords' frequencies
+    map m;
+    for (int i = 0; i < num_pwds; i++)
+        m.insert(arr_pwds[i], m.getFreq(arr_pwds[i]) + 1, i);
+    // Sort passwords by frequency -> length -> postion
+    for (int i = 0; i < num_pwds - 1; i++)
+    {
+        for (int j = 0; j < num_pwds - i - 1; j++)
+        {
+            int a1 = m.getFreq(arr_pwds[j]);
+            int b1 = m.getFreq(arr_pwds[j + 1]);
+            if (a1 > b1)
+                swap(arr_pwds[j], arr_pwds[j + 1]);
+            else if (a1 == b1)
+            {
+                int a2 = strlen(arr_pwds[j]);
+                int b2 = strlen(arr_pwds[j + 1]);
+                if (a2 > b2)
+                    swap(arr_pwds[j], arr_pwds[j + 1]);
+                else if (a2 == b2)
+                {
+                    if (m.getPos(arr_pwds[j]) < m.getPos(arr_pwds[j + 1]))
+                        swap(arr_pwds[j], arr_pwds[j + 1]);
+                }
+            }
+        }
+    }
+    // The last value after the sorting is the result
+    return m.getPos(arr_pwds[num_pwds - 1]);
 }
+/*
+pink#pink   2   1
+pink@123    3   2
+1234#xyz    1   0
+123!pink    1   3
+*/
 int main()
 {
-    const char *s = "Gbcccg1cc";
-    const char *email = "ccg1@dgc$";
-    cout << checkPassword(s, email);
-    // cout << fixed << setprecision(20) << (330 * 110 / 100.0);
+    // map m;
+
+    // m.insert("apple", 5);
+    // m.insert("banana", 10);
+    // m.insert("orange", 7);
+
+    // cout << "freq of apple: " << m.getValue("apple") << endl;
+    // cout << "Value of banana: " << m.getValue("banana") << endl;
+    // cout << "Value of orange: " << m.getValue("orange") << endl;
+    // cout << "Value of not exist: " << m.getValue("orangee") << endl;
+    // return 0;
+    const char *arr_pwds[7] = {"pink@123", "123!pink", "1234#xyz", "pink#pink", "pink#pink",
+                               "pink@123"};
+    cout << findCorrectPassword(arr_pwds, 6);
 }

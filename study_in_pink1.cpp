@@ -339,11 +339,94 @@ int checkPassword(const char *s, const char *email)
 }
 
 // Task 5
+// Define a new map datatype
+struct node
+{
+    const char *pwd;
+    int freq;
+    int pos;
+    node *next;
+};
+struct map
+{
+private:
+    node *root;
+
+public:
+    map() : root(nullptr) {}
+    void insert(const char *pwd, int freq, int pos)
+    {
+        // Check if key already exists
+        node *current = root;
+        while (current != nullptr)
+        {
+            if (strcmp(current->pwd, pwd) == 0)
+            {
+                // Update value if key exists
+                current->freq = freq;
+                current->pos = min(pos, current->pos);
+                return;
+            }
+            current = current->next;
+        }
+        // Key doesn't exist, create a new node
+        node *newNode = new node{pwd, freq, pos, root};
+        root = newNode;
+    }
+    int getFreq(const char *pwd)
+    {
+        node *current = root;
+        while (current != nullptr)
+        {
+            if (strcmp(current->pwd, pwd) == 0)
+                return current->freq;
+            current = current->next;
+        }
+        return 0;
+    }
+    int getPos(const char *pwd)
+    {
+        node *current = root;
+        while (current != nullptr)
+        {
+            if (strcmp(current->pwd, pwd) == 0)
+                return current->pos;
+            current = current->next;
+        }
+        return 0;
+    }
+};
 int findCorrectPassword(const char *arr_pwds[], int num_pwds)
 {
-    // TODO: Complete this function
-
-    return -1;
+    // Map for storing passwords' frequencies
+    map m;
+    for (int i = 0; i < num_pwds; i++)
+        m.insert(arr_pwds[i], m.getFreq(arr_pwds[i]) + 1, i);
+    // Sort passwords by frequency -> length -> postion
+    for (int i = 0; i < num_pwds - 1; i++)
+    {
+        for (int j = 0; j < num_pwds - i - 1; j++)
+        {
+            int a1 = m.getFreq(arr_pwds[j]);
+            int b1 = m.getFreq(arr_pwds[j + 1]);
+            if (a1 > b1)
+                swap(arr_pwds[j], arr_pwds[j + 1]);
+            else if (a1 == b1)
+            {
+                int a2 = strlen(arr_pwds[j]);
+                int b2 = strlen(arr_pwds[j + 1]);
+                if (a2 > b2)
+                    swap(arr_pwds[j], arr_pwds[j + 1]);
+                else if (a2 == b2)
+                {
+                    if (m.getPos(arr_pwds[j]) < m.getPos(arr_pwds[j + 1]))
+                        swap(arr_pwds[j], arr_pwds[j + 1]);
+                }
+            }
+        }
+    }
+    // The last value after the sorting is the result
+    return m.getPos(arr_pwds[num_pwds - 1]);
 }
 
 ////////////////////////////////////////////////
