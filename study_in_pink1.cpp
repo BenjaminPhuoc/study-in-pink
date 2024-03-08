@@ -339,94 +339,59 @@ int checkPassword(const char *s, const char *email)
 }
 
 // Task 5
-// Define a new map datatype
-struct node
+// New password datatype
+struct password
 {
-    const char *pwd;
-    int freq;
+    int len;
     int pos;
-    node *next;
+    int count;
 };
-struct map
-{
-private:
-    node *root;
 
-public:
-    map() : root(nullptr) {}
-    void insert(const char *pwd, int freq, int pos)
-    {
-        // Check if key already exists
-        node *current = root;
-        while (current != nullptr)
-        {
-            if (strcmp(current->pwd, pwd) == 0)
-            {
-                // Update value if key exists
-                current->freq = freq;
-                current->pos = min(pos, current->pos);
-                return;
-            }
-            current = current->next;
-        }
-        // Key doesn't exist, create a new node
-        node *newNode = new node{pwd, freq, pos, root};
-        root = newNode;
-    }
-    int getFreq(const char *pwd)
-    {
-        node *current = root;
-        while (current != nullptr)
-        {
-            if (strcmp(current->pwd, pwd) == 0)
-                return current->freq;
-            current = current->next;
-        }
-        return 0;
-    }
-    int getPos(const char *pwd)
-    {
-        node *current = root;
-        while (current != nullptr)
-        {
-            if (strcmp(current->pwd, pwd) == 0)
-                return current->pos;
-            current = current->next;
-        }
-        return 0;
-    }
-};
 int findCorrectPassword(const char *arr_pwds[], int num_pwds)
 {
-    // Map for storing passwords' frequencies
-    map m;
+    // Copy arr_pwds to a new array of input strings
+    string arr_pwds1[num_pwds];
     for (int i = 0; i < num_pwds; i++)
-        m.insert(arr_pwds[i], m.getFreq(arr_pwds[i]) + 1, i);
-    // Sort passwords by frequency -> length -> postion
+        arr_pwds1[i] = arr_pwds[i];
+
+    password pwds[num_pwds] = {0}; // Array contains passwords' properties
+    for (int i = 0; i < num_pwds; i++)
+    {
+        // Position in the input array
+        pwds[i].pos = i;
+        pwds[i].len = arr_pwds1[i].size(); // Size
+        for (int j = 0; j < num_pwds; j++) // Frequency
+        {
+            if (arr_pwds1[i] == arr_pwds1[j] && i > j)
+            {
+                pwds[i].count = -1;
+                break;
+            }
+            if (arr_pwds1[i] == arr_pwds1[j])
+                pwds[i].count++;
+        }
+    }
+    // Bubble sort by order:
+    // Greater frequency -> Longer size -> Smaller position
     for (int i = 0; i < num_pwds - 1; i++)
     {
         for (int j = 0; j < num_pwds - i - 1; j++)
         {
-            int a1 = m.getFreq(arr_pwds[j]);
-            int b1 = m.getFreq(arr_pwds[j + 1]);
-            if (a1 > b1)
-                swap(arr_pwds[j], arr_pwds[j + 1]);
-            else if (a1 == b1)
+            if (pwds[j].count > pwds[j + 1].count)
+                swap(pwds[j], pwds[j + 1]);
+            else if (pwds[j].count == pwds[j + 1].count)
             {
-                int a2 = strlen(arr_pwds[j]);
-                int b2 = strlen(arr_pwds[j + 1]);
-                if (a2 > b2)
-                    swap(arr_pwds[j], arr_pwds[j + 1]);
-                else if (a2 == b2)
+                if (pwds[j].len > pwds[j + 1].len)
+                    swap(pwds[j], pwds[j + 1]);
+                else if (pwds[j].len == pwds[j + 1].len)
                 {
-                    if (m.getPos(arr_pwds[j]) < m.getPos(arr_pwds[j + 1]))
-                        swap(arr_pwds[j], arr_pwds[j + 1]);
+                    if (pwds[j].pos < pwds[j + 1].pos)
+                        swap(pwds[j], pwds[j + 1]);
                 }
             }
         }
     }
-    // The last value after the sorting is the result
-    return m.getPos(arr_pwds[num_pwds - 1]);
+    return pwds[num_pwds - 1].pos;
 }
 
 ////////////////////////////////////////////////
